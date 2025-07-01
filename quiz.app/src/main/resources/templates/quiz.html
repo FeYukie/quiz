@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quizer</title>
-    <link rel="stylesheet" href="/styles.css">
+    <title>Meu Quiz Spring Boot</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
- <header>
+    <header>
         <nav class="menu">
             <div class="logo">
                 <a href="/">QUIZER</a><br>
             </div>
             <a href="/">INÍCIO</a>
-            <a href="/quizes">QUIZES</a> <a href="/ranking">RANKINGS</a>
+            <a href="/quizes/novo">CRIAR QUIZ</a>
+            <a href="#">RANKINGS</a>
             <a href="#">SAIR</a>
         </nav>
     </header>
@@ -24,8 +26,7 @@
         <div th:if="${pergunta != null}" class="question">
             <p th:text="${pergunta.textoLancado}"></p>
 
-            <form action="/responder" method="post">
-                <ul class="options">
+            <form th:action="@{/quiz/responder}" method="post"> <ul class="options">
                     <li th:each="alternativa, i : ${pergunta.alternativas}">
                         <label>
                             <input type="radio" name="userAnswer" th:value="${i.index + 1}" required>
@@ -33,8 +34,7 @@
                         </label>
                     </li>
                 </ul>
-                <input type="hidden" name="perguntaId" th:value="${pergunta.id}">
-                <input type="hidden" name="questionIndex" th:value="${questionIndex}">
+                <input type="hidden" name="quizId" th:value="${quizId}"> <input type="hidden" name="perguntaId" th:value="${pergunta.id}"> <input type="hidden" name="questionIndex" th:value="${questionIndex}">
                 <input type="hidden" name="score" th:value="${score}">
                 
                 <button type="submit">Próxima Pergunta</button>
