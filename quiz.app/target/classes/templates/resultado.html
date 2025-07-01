@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado do Quiz</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header>
+        <nav class="menu">
+            <div class="logo">
+                <a href="/">QUIZER</a><br>
+            </div>
+            <a href="/">INÍCIO</a>
+            <a href="/quizes">QUIZES</a>
+            <a href="/ranking">RANKINGS</a>
+            <a href="#">QUEM SOMOS</a>
+            <a href="#">SAIR</a>
+        </nav>
+    </header>
+    <div class="quiz-container">
+        <h1>Fim do Quiz!</h1>
+        <div id="result">
+            Você acertou <span th:text="${score}"></span> de <span th:text="${totalPerguntas}"></span> perguntas!
+        </div>
+        <form action="/" method="get">
+            <button type="submit">Reiniciar Quiz</button>
+        </form>
+    </div>
+</body>
+</html>

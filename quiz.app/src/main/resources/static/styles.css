@@ -1,0 +1,182 @@
+/* Seu CSS para o cabeçalho e navegação */
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background: rgb(172, 172, 243); /* Fundo azul claro */
+    color: rgb(0, 0, 0);
+    text-align: center;
+}
+
+header {
+    /* Para fixar o cabeçalho no topo */
+    position: fixed; /* Fixa o elemento em relação à viewport */
+    top: 0; /* Alinha no topo */
+    left: 0; /* Alinha na esquerda */
+    width: 100%; /* Ocupa a largura total da tela */
+    z-index: 1000; /* Garante que ele fique acima de outros elementos */
+
+    display: flex;
+    justify-content: space-between; /* Mantém logo e menu separados */
+    align-items: center;
+    background: #0a0a0a; /* Fundo escuro para o cabeçalho */
+    padding: 20px;
+    border-bottom: 1px solid #222;
+    box-sizing: border-box; /* Inclui padding na largura total */
+}
+
+.menu {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.menu a {
+    color: rgb(225, 222, 222); /* Texto do menu claro */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.menu a:hover {
+    color: white;
+}
+
+.logo {
+    color:red; /* Cor vermelha para o logo */
+}
+
+/* Opcional: Se você tinha nav ul fora de .menu, pode manter ou ajustar */
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+nav a { /* Isso pode ser redundante com .menu a */
+    color: rgb(225, 222, 222);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* Opcional: Seções genéricas que não são do quiz */
+.secao {
+    text-align: center;
+    padding: 30px;
+    background: #ffffff;
+    color: #fff; /* Cuidado aqui, cor do texto branco em fundo branco */
+    margin-left: 20%;
+    margin-right: 20%;
+    margin-top: 10%;
+    margin-bottom: 10%;
+}
+
+/* Opcional: Botões de carrossel (se for usar) */
+.carousel-btn {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 1.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.carousel-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+.quiz-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 650px;
+    text-align: center;
+    box-sizing: border-box;
+
+    /* Ajustes para centralização e espaçamento do cabeçalho fixo */
+    margin: 100px auto 50px auto; /* Topo: 100px (para espaço do header), Horizontal: auto (centraliza), Baixo: 50px */
+    /* O 100px é um valor estimado para o header. Se ele for mais alto, aumente este valor. */
+}
+
+h1 { /* Sobrescrevendo a cor do h1 global para o quiz container */
+    color: #0056b3;
+    margin-bottom: 25px;
+    font-size: 2.2em;
+    font-weight: 600;
+}
+
+.question p {
+    font-size: 1.3em;
+    margin-bottom: 20px;
+    color: #444;
+    line-height: 1.5;
+}
+
+.options {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.options li {
+    margin-bottom: 12px;
+}
+
+.options label {
+    display: block;
+    background-color: #f0f8ff;
+    padding: 15px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    border: 1px solid #cceeff;
+}
+
+.options label:hover {
+    background-color: #e6f3ff;
+    transform: translateY(-2px);
+}
+
+.options input[type="radio"] {
+    margin-right: 15px;
+    transform: scale(1.3);
+    vertical-align: middle;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 500;
+    margin-top: 30px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.message {
+    margin-top: 20px;
+    font-size: 1.1em;
+    color: #d9534f;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+#result {
+    margin-top: 30px;
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #28a745;
+}
