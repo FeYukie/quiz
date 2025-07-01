@@ -1,15 +1,14 @@
 package com.example.quiz.app;
 
-import com.example.quiz.app.Pergunta;
-import com.example.quiz.app.Quiz;
-import com.example.quizapp.service.QuizService;
+import com.example.quiz.app.*; // Importa todas as classes do pacote model
+import com.example.quiz.app.QuizService;
+import com.example.quiz.app.UsuarioService; // Importa o novo serviço
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,11 +16,40 @@ import java.util.Optional;
 public class QuizController {
 
     private final QuizService quizService;
+    private final UsuarioService usuarioService; // Injeta o serviço de usuário
 
     @Autowired
-    public QuizController(QuizService quizService) {
+    public QuizController(QuizService quizService, UsuarioService usuarioService) {
         this.quizService = quizService;
+        this.usuarioService = usuarioService;
     }
+
+    // --- Endpoints de Autenticação/Cadastro ---
+
+    @GetMapping("/login")
+    public String showLoginForm() {
+        return "login"; // Retorna o template login.html
+    }
+
+    @GetMapping("/cadastro")
+    public String showCadastroForm(Model model) {
+        model.addAttribute("usuario", new Usuario()); // Objeto para o formulário Thymeleaf
+        return "cadastro"; // Retorna o template cadastro.html
+    }
+
+    @PostMapping("/cadastro")
+    public String registerUser(@ModelAttribute Usuario usuario, RedirectAttributes redirectAttributes) {
+        try {
+            usuarioService.registrarNovoUsuario(usuario.getUsername(), usuario.getPassword());
+            redirectAttributes.addFlashAttribute("message", "Cadastro realizado com sucesso! Faça login.");
+            return "redirect:/login";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/cadastro";
+        }
+    }
+
+    // --- Endpoints do Quiz (já existentes, com possíveis ajustes) ---
 
     // Endpoint para a página inicial (lista de quizzes)
     // Acessar via: GET http://localhost:8080/
@@ -29,7 +57,7 @@ public class QuizController {
     public String listarQuizes(Model model) {
         List<Quiz> quizes = quizService.getTodosOsQuizes();
         model.addAttribute("quizes", quizes);
-        return "index"; // Novo template: index.html
+        return "index"; // Template: index.html
     }
 
     // Endpoint para exibir a página de criação de quiz
@@ -37,36 +65,25 @@ public class QuizController {
     @GetMapping("/quizes/novo")
     public String showCriarQuizForm(Model model) {
         model.addAttribute("quiz", new Quiz());
-        // Adiciona uma pergunta vazia inicial para o formulário
-        model.addAttribute("pergunta", new Pergunta());
-        return "criar-quiz"; // Novo template: criar-quiz.html
+        model.addAttribute("pergunta", new Pergunta()); // Objeto para o formulário de perguntas
+        return "criar-quiz"; // Template: criar-quiz.html
     }
 
     // Endpoint para processar o formulário de criação de quiz
-    // Acessar via: POST de um formulário em /quizes/novo
     @PostMapping("/quizes/novo")
     public String criarQuiz(@ModelAttribute Quiz quiz, RedirectAttributes redirectAttributes) {
-        // As perguntas virão do formulário, mas precisamos garantir que cada pergunta
-        // tenha o quiz associado e que as alternativas estejam populadas corretamente.
-        // O Thymeleaf e Spring MVC já fazem um bom trabalho em ligar os campos do form ao objeto Quiz.
-
-        // Em um cenário real, você faria validações aqui.
-        quizService.criarNovoQuiz(quiz); // Salva o quiz e suas perguntas
-
+        quizService.criarNovoQuiz(quiz);
         redirectAttributes.addFlashAttribute("message", "Quiz criado com sucesso!");
         return "redirect:/"; // Redireciona para a lista de quizzes
     }
 
-
     // Endpoint para iniciar um quiz específico
-    // Acessar via: GET http://localhost:8080/quiz/{quizId}
     @GetMapping("/quiz/{quizId}")
     public String iniciarQuizEspecifico(@PathVariable Long quizId, Model model) {
-        return "redirect:/quiz/" + quizId + "?questionIndex=0&score=0";
+        return "redirect:/quiz/" + quizId + "/pergunta?questionIndex=0&score=0";
     }
 
     // Endpoint para exibir as perguntas de um quiz específico
-    // Acessar via: GET http://localhost:8080/quiz/{quizId}?questionIndex=X&score=Y
     @GetMapping("/quiz/{quizId}/pergunta")
     public String exibirPergunta(
             @PathVariable Long quizId,
@@ -77,7 +94,6 @@ public class QuizController {
     ) {
         Optional<Quiz> quizOptional = quizService.getQuizPorId(quizId);
         if (quizOptional.isEmpty()) {
-            // Quiz não encontrado, redireciona para a página inicial com erro
             return "redirect:/?error=QuizNaoEncontrado";
         }
 
@@ -86,26 +102,24 @@ public class QuizController {
 
         if (questionIndex >= 0 && questionIndex < perguntasDoQuiz.size()) {
             Pergunta perguntaAtual = perguntasDoQuiz.get(questionIndex);
-            model.addAttribute("quizId", quizId); // Passa o ID do quiz
+            model.addAttribute("quizId", quizId);
             model.addAttribute("pergunta", perguntaAtual);
             model.addAttribute("questionIndex", questionIndex);
             model.addAttribute("score", score);
             if (message != null) {
                 model.addAttribute("message", message);
             }
-            return "quiz"; // Retorna o template quiz.html
+            return "quiz";
         } else {
-            // Fim do quiz, redireciona para a tela de resultado
             return "redirect:/resultado?score=" + score + "&total=" + perguntasDoQuiz.size();
         }
     }
 
     // Endpoint para processar a resposta do usuário para um quiz específico
-    // Acessar via: POST de um formulário em /quiz/responder
     @PostMapping("/quiz/responder")
     public String processarResposta(
-            @RequestParam(name = "quizId") Long quizId, // Recebe o ID do quiz
-            @RequestParam(name = "perguntaId") Long perguntaId, // O ID da pergunta atual
+            @RequestParam(name = "quizId") Long quizId,
+            @RequestParam(name = "perguntaId") Long perguntaId,
             @RequestParam(name = "userAnswer") int userAnswer,
             @RequestParam(name = "questionIndex") int currentQuestionIndex,
             @RequestParam(name = "score") int currentScore
@@ -115,17 +129,18 @@ public class QuizController {
             currentScore++;
             message = "Correto!";
         } else {
-            Optional<Pergunta> p = quizService.getPerguntaDoQuizPorIndice(quizId, currentQuestionIndex); // Busca a pergunta pelo ID
+            Optional<Pergunta> p = quizService.getPerguntaDoQuizPorIndice(quizId, currentQuestionIndex);
             if(p.isPresent()){
+                // O índice da resposta correta é 0-based, mas a exibição no HTML é 1-based
                 message = "Incorreto. A resposta correta era: " + (p.get().getIndiceAlternativaCorreta() + 1);
             } else {
-                message = "Incorreto.";
+                message = "Incorreto."; // Caso a pergunta não seja encontrada (improvável)
             }
         }
         return "redirect:/quiz/" + quizId + "/pergunta?questionIndex=" + (currentQuestionIndex + 1) + "&score=" + currentScore + "&message=" + message;
     }
 
-    // Endpoint para exibir o resultado final 
+    // Endpoint para exibir o resultado final
     @GetMapping("/resultado")
     public String exibirResultado(
             @RequestParam(name = "score") int score,
