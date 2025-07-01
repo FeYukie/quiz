@@ -1,4 +1,4 @@
-package com.example.quizapp.model;
+package com.example.quiz.app;
 
 import jakarta.persistence.*;
 import java.util.ArrayList;
