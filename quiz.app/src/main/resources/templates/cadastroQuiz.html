@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Novo Quiz</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos específicos para o formulário de criação, se necessário */
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .question-block {
+            border: 1px solid #eee;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .alternative-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .alternative-group input[type="radio"] {
+            margin-right: 10px;
+        }
+        .alternative-group input[type="text"] {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        .add-remove-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+        .remove-btn {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="menu">
+            <div class="logo">
+                <a href="/">QUIZER</a><br>
+            </div>
+            <a href="/">INÍCIO</a>
+            <a href="/quizes/novo">CRIAR QUIZ</a>
+            <a href="#">RANKINGS</a>
+            <a href="#">QUEM SOMOS</a>
+            <a href="#">SAIR</a>
+        </nav>
+    </header>
+
+    <div class="quiz-container">
+        <h1>Criar Novo Quiz</h1>
+
+        <form th:action="@{/quizes/novo}" th:object="${quiz}" method="post">
+            <div class="form-group">
+                <label for="titulo">Título do Quiz:</label>
+                <input type="text" id="titulo" th:field="*{titulo}" required>
+            </div>
+
+            <h2>Perguntas</h2>
+            <div id="questions-container">
+                <div class="question-block" th:fragment="questionFragment">
+                    <div class="form-group">
+                        <label>Texto da Pergunta:</label>
+                        <input type="text" th:name="|perguntas[${status.index}].textoPergunta|" required>
+                    </div>
+
+                    <label>Alternativas:</label>
+                    <div class="alternative-group">
+                        <input type="radio" th:name="|perguntas[${status.index}].indiceAlternativaCorreta|" value="0" required>
+                        <input type="text" th:name="|perguntas[${status.index}].alternativas[0]|" placeholder="Alternativa 1" required>
+                    </div>
+                    <div class="alternative-group">
+                        <input type="radio" th:name="|perguntas[${status.index}].indiceAlternativaCorreta|" value="1" required>
+                        <input type="text" th:name="|perguntas[${status.index}].alternativas[1]|" placeholder="Alternativa 2" required>
+                    </div>
+                    <div class="alternative-group">
+                        <input type="radio" th:name="|perguntas[${status.index}].indiceAlternativaCorreta|" value="2" required>
+                        <input type="text" th:name="|perguntas[${status.index}].alternativas[2]|" placeholder="Alternativa 3" required>
+                    </div>
+                    <div class="alternative-group">
+                        <input type="radio" th:name="|perguntas[${status.index}].indiceAlternativaCorreta|" value="3" required>
+                        <input type="text" th:name="|perguntas[${status.index}].alternativas[3]|" placeholder="Alternativa 4" required>
+                    </div>
+                    <button type="button" class="remove-btn" onclick="removeQuestion(this)">Remover Pergunta</button>
+                </div>
+            </div>
+            
+            <button type="button" class="add-remove-btn" onclick="addQuestion()">Adicionar Pergunta</button>
+            <button type="submit">Salvar Quiz</button>
+        </form>
+    </div>
+
+    <script>
+        let questionIndex = 0; // Começa com 0 ou com o número de perguntas existentes se houver
+        const questionsContainer = document.getElementById('questions-container');
+
+        // Adiciona uma pergunta inicial ao carregar a página
+        addQuestion();
+
+        function addQuestion() {
+            const newQuestionBlock = document.createElement('div');
+            newQuestionBlock.className = 'question-block';
+            newQuestionBlock.innerHTML = `
+                <div class="form-group">
+                    <label>Texto da Pergunta:</label>
+                    <input type="text" name="perguntas[${questionIndex}].textoPergunta" required>
+                </div>
+
+                <label>Alternativas:</label>
+                <div class="alternative-group">
+                    <input type="radio" name="perguntas[${questionIndex}].indiceAlternativaCorreta" value="0" required>
+                    <input type="text" name="perguntas[${questionIndex}].alternativas[0]" placeholder="Alternativa 1" required>
+                </div>
+                <div class="alternative-group">
+                    <input type="radio" name="perguntas[${questionIndex}].indiceAlternativaCorreta" value="1" required>
+                    <input type="text" name="perguntas[${questionIndex}].alternativas[1]" placeholder="Alternativa 2" required>
+                </div>
+                <div class="alternative-group">
+                    <input type="radio" name="perguntas[${questionIndex}].indiceAlternativaCorreta" value="2" required>
+                    <input type="text" name="perguntas[${questionIndex}].alternativas[2]" placeholder="Alternativa 3" required>
+                </div>
+                <div class="alternative-group">
+                    <input type="radio" name="perguntas[${questionIndex}].indiceAlternativaCorreta" value="3" required>
+                    <input type="text" name="perguntas[${questionIndex}].alternativas[3]" placeholder="Alternativa 4" required>
+                </div>
+                <button type="button" class="remove-btn" onclick="removeQuestion(this)">Remover Pergunta</button>
+            `;
+            questionsContainer.appendChild(newQuestionBlock);
+            questionIndex++; // Incrementa para a próxima pergunta
+            updateQuestionIndexes(); // Reorganiza os índices após adicionar
+        }
+
+        function removeQuestion(button) {
+            button.closest('.question-block').remove();
+            updateQuestionIndexes(); // Reorganiza os índices após remover
+            if (questionsContainer.children.length === 0) {
+                addQuestion(); // Garante que sempre haja pelo menos uma pergunta
+            }
+        }
+
+        // Função para reindexar as perguntas após adicionar/remover
+        function updateQuestionIndexes() {
+            const questionBlocks = questionsContainer.querySelectorAll('.question-block');
+            questionBlocks.forEach((block, idx) => {
+                block.querySelectorAll('[name^="perguntas["]').forEach(input => {
+                    const name = input.getAttribute('name');
+                    input.setAttribute('name', name.replace(/perguntas\[\d+\]/, `perguntas[${idx}]`));
+                });
+            });
+            // Atualiza o questionIndex global para refletir o número de blocos
+            questionIndex = questionBlocks.length;
+        }
+    </script>
+</body>
+</html>
